@@ -17,12 +17,11 @@
 </template>
 
 <script setup>
-import { onMounted, getCurrentInstance } from 'vue'
+import { onMounted } from 'vue'
 import * as config from '@/config'
 
 function login() {
-  const instance = getCurrentInstance()
-  instance.proxy.signin(config.serverUrl).then((res) => {
+  window.sdk.signin(config.serverUrl).then((res) => {
     if (res.status === 'ok') {
       alert('Login success')
       if (inIframe()) {

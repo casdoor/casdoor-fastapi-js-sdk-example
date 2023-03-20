@@ -29,13 +29,13 @@
 <script setup>
 import { onMounted } from 'vue'
 import backend from '@/backend/backend'
-import { useCasdoor } from 'casdoor-vue-sdk';
+
 onMounted(() => {
-  const { silentSignin } = useCasdoor()
+
   const params = new URLSearchParams(window.location.search);
   const key = params.get("silentSignin")
   if (key == 1) {
-    silentSignin(()=>{window.location.href = './home'},()=>{console.log("false")});
+    window.sdk.silentSignin(()=>{window.location.href = './home'},()=>{console.log("false")})
   } else {
     let url = window.location.pathname
     if (url === '/') {

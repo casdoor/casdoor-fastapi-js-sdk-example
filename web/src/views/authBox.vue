@@ -20,17 +20,15 @@
 </template>
 
 <script setup>
-  import { onMounted, getCurrentInstance } from 'vue'
+  import { onMounted } from 'vue'
   import backend from '@/backend/backend'
 
-  const instance = getCurrentInstance()
-
   function login() {
-    window.location.href = instance.proxy.getSigninUrl()
+    window.location.href = window.sdk.getSigninUrl()
   }
 
   function signup() {
-    window.location.href = instance.proxy.getSignupUrl()
+    window.location.href = window.sdk.getSignupUrl()
   }
   
   onMounted(() => {

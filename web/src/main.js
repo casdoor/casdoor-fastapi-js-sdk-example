@@ -15,16 +15,16 @@
 import {createApp} from 'vue'
 import App from './App.vue'
 import router from './route/index'
-import Casdoor from 'casdoor-vue-sdk'
-
-const config = {
+import SDK from 'casdoor-js-sdk'
+const sdkConfig = {
   serverUrl: "https://door.casdoor.com",
   clientId: "294b09fbc17f95daf2fe",
   organizationName: "casbin",
   appName: "app-vue-python-example",
   redirectPath: "/callback",
-};
+  signinPath: "/api/signin",
+}
+window.sdk = new SDK(sdkConfig)
 const app = createApp(App)
-app.use(Casdoor, config)
 app.use(router)
 app.mount('#app')
