@@ -12,18 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from casdoor import CasdoorSDK
-from flask import current_app, jsonify, session
-from flask_restful import Resource
+from fastapi import APIRouter, Depends
+from starlette.requests import Request
+from starlette.responses import JSONResponse
+from .utils import authz_required, get_user_from_session
 
-from .utils import authz_required
+router = APIRouter()
 
 
-class Account(Resource):
-
-    @authz_required
-    def get(self):
-        sdk: CasdoorSDK = current_app.config.get('CASDOOR_SDK')
-        user = session.get('casdoorUser')
-        print(user)
-        return jsonify({'status': 'ok', 'data': sdk.get_user(user['name'])})
+@router.get("/api/get-account", response_class=JSONResponse)
+async def get_account(request: Request, user=Depends(get_user_from_session)):
+    sdk = request.app.state.CASDOOR_SDK
+    print(user)
+    return {"status": "ok", "data": sdk.get_user(user["name"])}

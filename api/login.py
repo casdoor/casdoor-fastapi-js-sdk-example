@@ -13,43 +13,36 @@
 # limitations under the License.
 
 from casdoor import CasdoorSDK
-from flask import jsonify, redirect, current_app, request, session, make_response, render_template
-from flask_restful import Resource, reqparse
+from fastapi import APIRouter, Depends, Form
+from starlette.requests import Request
+from starlette.responses import JSONResponse, RedirectResponse, HTMLResponse
+from fastapi.templating import Jinja2Templates
 
-from .utils import authz_required
-
-
-class SignIn(Resource):
-
-    def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('code', required=True, location='args')
-        parser.add_argument('state', required=True, location='args')
-        args = parser.parse_args()
-        code = args['code']
-        state = args['state']
-
-        sdk: CasdoorSDK = current_app.config.get('CASDOOR_SDK')
-        token = sdk.get_oauth_token(code)
-        user = sdk.parse_jwt_token(token)
-        session['casdoorUser'] = user
-
-        return jsonify({'status': 'ok'})
+router = APIRouter()
+templates = Jinja2Templates(directory="templates")  # 请确保已经创建了“templates”文件夹并包含“index.html”
 
 
-class SignOut(Resource):
+@router.post("/api/signin", response_class=JSONResponse)
+async def post_signin(request: Request):
+    code = request.query_params.get("code")
+    state = request.query_params.get("state")
 
-    @authz_required
-    def post(self):
-        del session['casdoorUser']
-        return jsonify({
-            'status': 'ok'
-        })
+    sdk = request.app.state.CASDOOR_SDK
+    token = sdk.get_oauth_token(code)
+    user = sdk.parse_jwt_token(token)
+    request.session["casdoorUser"] = user
+
+    return {"status": "ok"}
 
 
-class ToLogin(Resource):
+@router.post("/api/signout", response_class=JSONResponse)
+async def post_signout(request: Request):
+    del request.session["casdoorUser"]
+    return {"status": "ok"}
 
-    def get(self):
-        sdk: CasdoorSDK = current_app.config.get('CASDOOR_SDK')
-        redirect_url = sdk.get_auth_link(redirect_uri=current_app.config.get('REDIRECT_URI'), state='app-built-in')
-        return make_response(render_template('tologin.html', redirect_url=redirect_url))
+
+@router.get("/toLogin", response_class=HTMLResponse)
+async def to_login(request: Request):
+    sdk: CasdoorSDK = request.app.state.CASDOOR_SDK
+    redirect_url = sdk.get_auth_link(redirect_uri=request.app.state.REDIRECT_URI, state='app-built-in')
+    return templates.TemplateResponse("tologin.html", {"request": request, "redirect_url": redirect_url})

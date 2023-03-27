@@ -1,4 +1,6 @@
-flask
-flask-restful
-flask-cors
+fastapi
+itsdangerous
+jinja2
+starlette
+uvicorn
 casdoor>=1.2.0

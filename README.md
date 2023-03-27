@@ -1,5 +1,5 @@
-<h1 align="center" style="border-bottom: none;">📦⚡️Casdoor Vue + Python example</h1>
-<h3 align="center">An example of casdoor-vue-sdk and casdoor-python-sdk</h3>
+<h1 align="center" style="border-bottom: none;">📦⚡️Casdoor Javascript + Python FastAPI example</h1>
+<h3 align="center">An example of casdoor-js-sdk and casdoor-python-sdk</h3>
 
 ## Architecture
 
@@ -7,8 +7,8 @@ Example contains 2 parts:
 
 | Name     | SDK                | Language         | Source code                                                               |
 |----------|--------------------|------------------|---------------------------------------------------------------------------|
-| Frontend | casdoor-vue-sdk    | Javascript + Vue | https://github.com/casdoor/casdoor-python-vue-sdk-example/tree/master/web |
-| Backend  | casdoor-python-sdk | Python + Flask   | https://github.com/casdoor/casdoor-python-vue-sdk-example                 |
+| Frontend | casdoor-vue-sdk    | Javascript       | https://github.com/casdoor/casdoor-fastapi-js-sdk-example/tree/master/web |
+| Backend  | casdoor-python-sdk | Python + FastAPI | https://github.com/casdoor/casdoor-fastapi-js-sdk-example                 |
 
 ## Installation
 
@@ -17,7 +17,7 @@ Example uses Casdoor to manage members. So you need to create an organization an
 ### Get the code
 
 ```shell
-git clone https://github.com/casdoor/casdoor-python-vue-sdk-example
+git clone https://github.com/casdoor/casdoor-fastapi-js-sdk-example
 ```
 
 ## Configuration
@@ -88,8 +88,8 @@ CASDOOR_SDK = CasdoorSDK(
 - install dependencies
 
   ```shell
-  PS .\casdoor-python-vue-sdk-example\web> yarn install
-  PS .\casdoor-python-vue-sdk-example> pip install -r requirements.txt
+  PS .\casdoor-fastapi-js-sdk-example\web> yarn install
+  PS .\casdoor-fastapi-js-sdk-example> pip install -r requirements.txt
   ```
 
 - run
@@ -97,15 +97,15 @@ CASDOOR_SDK = CasdoorSDK(
 For Linux:
 
   ```
-  user@machine:/casdoor-python-vue-sdk-example/web$ yarn serve
-  user@machine:/casdoor-python-vue-sdk-example$ ./venv/Scripts/python app.py
+  user@machine:/casdoor-fastapi-js-sdk-example/web$ yarn serve
+  user@machine:/casdoor-fastapi-js-sdk-example$ ./venv/Scripts/python app.py
   ```
 
 For Windows:
 
   ```
-  PS .\casdoor-python-vue-sdk-example\web> yarn serve
-  PS .\casdoor-python-vue-sdk-example> venv\Scripts\python.exe app.py
+  PS .\casdoor-fastapi-js-sdk-example\web> yarn serve
+  PS .\casdoor-fastapi-js-sdk-example> venv\Scripts\python.exe app.py
   ```
 
 - Now, example runs its front end at port 8080 and runs it's back end at port 5000. You can modify the code and see what will happen.

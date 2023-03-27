@@ -12,16 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from flask import make_response, render_template, session
-from flask_restful import Resource
-
+from fastapi import APIRouter, Depends
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+from starlette.requests import Request
 from .utils import authz_required
 
+router = APIRouter()
+templates = Jinja2Templates(directory="templates")  # 请确保已经创建了“templates”文件夹并包含“index.html”
 
-class Index(Resource):
 
-    @authz_required
-    def get(self):
-        casdoorUser = session.get('casdoorUser')
-        headers = {'Content-Type': 'text/html'}
-        return make_response(render_template('index.html', title='title', username=casdoorUser.get('name')), 200, headers)
+@router.get("/", response_class=HTMLResponse)
+async def index(request: Request, casdoor_user=Depends(authz_required)):
+    return templates.TemplateResponse("index.html", {"request": request, "username": casdoor_user.get("name")})

@@ -12,17 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from functools import wraps
+from fastapi import Depends, HTTPException
+from starlette.requests import Request
 
-from flask import redirect, request, session, jsonify
+async def get_user_from_session(request: Request):
+    user = request.session.get("casdoorUser")
+    if user is None:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    return user
 
-
-def authz_required(f):
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        if 'casdoorUser' in session.keys():
-            return f(*args, **kwargs)
-        else:
-            return jsonify({'status': 'error'})
-
-    return wrapper
+def authz_required(request: Request):
+    if "casdoorUser" in request.session.keys():
+        return request.session["casdoorUser"]
+    else:
+        raise HTTPException(status_code=401, detail="Unauthorized")
