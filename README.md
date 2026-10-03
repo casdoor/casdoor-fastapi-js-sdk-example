@@ -12,7 +12,7 @@ Example contains 2 parts:
 
 ## Installation
 
-Example uses Casdoor to manage members. So you need to create an organization and an application for the example in a Casdoor instance. For how to install Casdoor, see: https://casdoor.org/docs/basic/server-installation
+Example uses Casdoor to manage members. So you need to create an organization and an application for the example in a Casdoor instance. For how to install Casdoor, see: https://casdoor.ai/docs/basic/server-installation/
 
 ### Get the code
 
