@@ -13,46 +13,42 @@
 # limitations under the License.
 
 import os
-from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import FileResponse
-from fastapi.staticfiles import StaticFiles
+
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.routing import Route
+from fastapi.responses import FileResponse
 from starlette.middleware.sessions import SessionMiddleware
 
-from config import Config
 from api.account import router as account_router
-from api.index import router as index_router
 from api.login import router as login_router
+from config import Config
+
+DIST_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "web", "dist"))
 
 app = FastAPI()
-
 app.include_router(account_router)
-# app.include_router(index_router)
 app.include_router(login_router)
 
-app.mount("/web", StaticFiles(directory="./web/dist", html=True), name="web")
 
-@app.get("/", include_in_schema=False)
-async def index(request: Request):
-    dist_dir = os.path.abspath(os.path.join(os.getcwd(), "./web/dist"))
-    return FileResponse(os.path.join(dist_dir, "index.html"))
-
+# Serves the built frontend (web/dist), so the whole example can also run on port 5000 only.
 @app.get("/{path:path}", include_in_schema=False)
-async def serve_static(request: Request, path: str):
-    if not path.startswith("api"):
-        dist_dir = os.path.abspath(os.path.join(os.getcwd(), "./web/dist"))
-        file_path = os.path.join(dist_dir, path)
-        if os.path.exists(file_path):
-            return FileResponse(file_path)
-        else:
-            return FileResponse(os.path.join(dist_dir, "index.html"))
-    else:
+async def serve_static(path: str):
+    if path.startswith("api"):
         raise HTTPException(status_code=404, detail="Not found")
+
+    file_path = os.path.join(DIST_DIR, path)
+    if path and os.path.isfile(file_path):
+        return FileResponse(file_path)
+
+    index_path = os.path.join(DIST_DIR, "index.html")
+    if not os.path.isfile(index_path):
+        raise HTTPException(status_code=404, detail="The frontend is not built, run `yarn build` in web/")
+    return FileResponse(index_path)
+
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:8080", "http://127.0.0.1:8080"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -64,11 +60,10 @@ app.add_middleware(
     session_cookie="fastapi-session",
 )
 
-app.state.CASDOOR_SDK = Config().CASDOOR_SDK
-app.state.REDIRECT_URI = Config().REDIRECT_URI
-app.state.SECRET_TYPE = Config().SECRET_TYPE
-app.state.SECRET_KEY = Config().SECRET_KEY
+app.state.CASDOOR_SDK = Config.CASDOOR_SDK
+app.state.REDIRECT_URI = Config.REDIRECT_URI
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="127.0.0.1", port=5000)

@@ -12,16 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Annotated
+
 from fastapi import APIRouter, Depends
-from starlette.requests import Request
 from starlette.responses import JSONResponse
-from .utils import authz_required, get_user_from_session
+
+from .utils import get_user_from_session
 
 router = APIRouter()
 
 
 @router.get("/api/get-account", response_class=JSONResponse)
-async def get_account(request: Request, user=Depends(get_user_from_session)):
-    sdk = request.app.state.CASDOOR_SDK
-    print(user)
-    return {"status": "ok", "data": sdk.get_user(user["name"])}
+async def get_account(user: Annotated[dict, Depends(get_user_from_session)]):
+    return {"status": "ok", "data": user}

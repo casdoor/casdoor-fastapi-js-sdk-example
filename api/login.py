@@ -13,36 +13,39 @@
 # limitations under the License.
 
 from casdoor import CasdoorSDK
-from fastapi import APIRouter, Depends, Form
-from starlette.requests import Request
-from starlette.responses import JSONResponse, RedirectResponse, HTMLResponse
+from fastapi import APIRouter
 from fastapi.templating import Jinja2Templates
+from starlette.requests import Request
+from starlette.responses import HTMLResponse, JSONResponse
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")  # 请确保已经创建了“templates”文件夹并包含“index.html”
+templates = Jinja2Templates(directory="templates")
 
 
 @router.post("/api/signin", response_class=JSONResponse)
 async def post_signin(request: Request):
     code = request.query_params.get("code")
-    state = request.query_params.get("state")
+    if not code:
+        return {"status": "error", "msg": "the code parameter is missing"}
 
-    sdk = request.app.state.CASDOOR_SDK
+    sdk: CasdoorSDK = request.app.state.CASDOOR_SDK
     token = sdk.get_oauth_token(code)
+    if "error" in token:
+        return {"status": "error", "msg": f"{token['error']}: {token.get('error_description', '')}"}
+
     user = sdk.parse_jwt_token(token["access_token"])
     request.session["casdoorUser"] = user
-
     return {"status": "ok"}
 
 
 @router.post("/api/signout", response_class=JSONResponse)
 async def post_signout(request: Request):
-    del request.session["casdoorUser"]
+    request.session.pop("casdoorUser", None)
     return {"status": "ok"}
 
 
 @router.get("/toLogin", response_class=HTMLResponse)
 async def to_login(request: Request):
     sdk: CasdoorSDK = request.app.state.CASDOOR_SDK
-    redirect_url = sdk.get_auth_link(redirect_uri=request.app.state.REDIRECT_URI, state='app-built-in')
-    return templates.TemplateResponse("tologin.html", {"request": request, "redirect_url": redirect_url})
+    redirect_url = sdk.get_auth_link(redirect_uri=request.app.state.REDIRECT_URI)
+    return templates.TemplateResponse(request, "tologin.html", {"redirect_url": redirect_url})

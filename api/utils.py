@@ -12,17 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from fastapi import Depends, HTTPException
+from fastapi import HTTPException
 from starlette.requests import Request
+
 
 async def get_user_from_session(request: Request):
     user = request.session.get("casdoorUser")
     if user is None:
         raise HTTPException(status_code=401, detail="Unauthorized")
     return user
-
-def authz_required(request: Request):
-    if "casdoorUser" in request.session.keys():
-        return request.session["casdoorUser"]
-    else:
-        raise HTTPException(status_code=401, detail="Unauthorized")

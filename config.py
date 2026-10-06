@@ -56,5 +56,4 @@ class Config:
         application_name='app-vue-python-example',
     )
     REDIRECT_URI = 'http://localhost:5000/api/signin'
-    SECRET_TYPE = 'filesystem'
     SECRET_KEY = os.urandom(24)
